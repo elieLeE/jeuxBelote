@@ -1,0 +1,11 @@
+jeux de belote (codage en C)
+
+deroulement du jeu :
+on melange avant (seule melange de la partie)
+-pour chaque main
+	-distribution des cartes => seulement 5 cartes
+	-choix de l'atout => au plus trois tours, avec ou sans atout possible
+	-distribution des cartes restantes
+	-realisation des 8 plis
+	-coupe
+-tant que le nombre de points min pas atteint, on  continue
