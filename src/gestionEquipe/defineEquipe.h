@@ -3,6 +3,7 @@
 
 #include "../gestionGame/defineGame.h"
 #include "../defines.h"
+#include "assert.h"
 
 typedef struct equipe equipe;
 typedef enum numEquipe numEquipe;

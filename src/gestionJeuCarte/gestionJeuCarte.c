@@ -37,6 +37,7 @@ void coupeJeu(carte *jeu){
 void distribution(carte* jeu, mainJoueur *joueurs, situationMain *sitM){
     coupeJeu(jeu);
     firstDistribution(jeu, joueurs, sitM->firstJoueur);
+    affMainJoueurs(joueurs);
     choixModeMain(joueurs, sitM, jeu[20]);
     secondeDistribution(jeu, joueurs, sitM->firstJoueur, sitM->preneur);
     trierMainJoueurs(joueurs, sitM->coulAtout);
@@ -45,10 +46,10 @@ void firstDistribution(carte* jeu, mainJoueur *joueurs, int firstJoueur){
     int h, i, j, k, p, lim;
     
     for(i=0; i<NBRE_JOUEURS; i++){
-	joueurs[i].nbreCarteInit[0] = 0;
-	joueurs[i].nbreCarteInit[1] = 0;
-	joueurs[i].nbreCarteInit[2] = 0;
-	joueurs[i].nbreCarteInit[3] = 0;
+	for(j=0; j<NBRE_COUL; j++){
+	    joueurs[i].nbreCarteInit[j] = 0;
+	    joueurs[i].nbreCarteRestantes[j] = 0;
+	}
     }
 
     lim = 3;

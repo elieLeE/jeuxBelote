@@ -9,5 +9,6 @@ void reInitEquipe(equipe *eq);
 void addPli(equipe *eq, pli newPli);
 void addPoints(equipe *eqs, situationMain *sitM);
 void initEquipe(equipe *eq);
+const char* nameEquipe(numEquipe num);
 
 #endif

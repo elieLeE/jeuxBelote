@@ -8,6 +8,13 @@ void miseAJourSitM(situationMain *sitM){
     sitM->actualPli.nbreCarte = 0;
 }
 
+void setParamChoixAtout(situationMain *sitM, structChoixAtout *s){
+    sitM->coulAtout = s->coulChosen;
+    sitM->preneur = s->preneur;
+    sitM->cartePrise = s->carteVisible;
+    sitM->modeMain = s->ench;
+}   
+
 void reInitSitMain(situationMain *sitM){
     sitM->nbreAtoutsTombes = 0;
     sitM->firstJoueur = (sitM->firstJoueur+1)%4;

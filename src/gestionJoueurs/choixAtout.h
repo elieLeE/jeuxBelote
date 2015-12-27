@@ -6,11 +6,14 @@
 #include "../gestionGame/defineGame.h"
 #include "../gestionJeuCarte/gestionCarte.h"
 #include "../autres/gestionAff.h"
+#include "../gestionGame/gestionSituationMain.h"
 #include "gestionMain.h"
 
+const char* nameModeAtout(enchereChoixAtout m);
 void choixModeMain(mainJoueur *joueurs, situationMain *sitM, carte carteVisible);
 
-bool priseOrNot(mainJoueur *m, carte *carteVis, couleur *colorChosen, enchereChoixAtout *ench, bool tour1, bool humanPlayer, bool priseObligatoire);
+bool priseOrNot(mainJoueur *m, structChoixAtout *s);
+void initStructChoixAtout(structChoixAtout *s, carte* c);
 
 bool prendColor(mainJoueur *m, carte *c, bool humanPlayer);
 bool prendColorHumanPlayer(mainJoueur *m, carte *c);

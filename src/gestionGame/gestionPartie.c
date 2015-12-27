@@ -12,7 +12,7 @@ void game(carte *jeu){
 	initMain(teams, &sitM);
 	distribution(jeu, joueurs, &sitM);
 	fJ = sitM.firstJoueur;
-	printf("main %d, atout : %s\n", numMain, nameCoul(sitM.coulAtout));
+	printf("main %d, carteVis : %s, atout : %s\n", numMain, nameCarte(&(sitM.cartePrise)), nameCoul(sitM.coulAtout));
 	affMainJoueurs(joueurs);
 	for(i=0; i<NBRE_PLIS; i++){
 	    newPli = nextPli(joueurs, &sitM);
@@ -48,7 +48,7 @@ void initMain(equipe *teams, situationMain *sitM){
 
 void endGame(equipe *teams){
     printf("partie termine !\n");
-    printf("equipe gagnante : %s\n", (teams[0].ptsTotal > teams[1].ptsTotal)? "NOUS":"EUX");
+    printf("equipe gagnante : %s\n", nameEquipe((teams[0].ptsTotal > teams[1].ptsTotal)? EQUIPE_1:EQUIPE_2));
     printf("score final : %d - %d\n", teams[0].ptsTotal, teams[1].ptsTotal);
 }
 

@@ -2,6 +2,7 @@
 #define _DEFINE_GAME_H_
 
 #include "../gestionJeuCarte/defineCarte.h"
+#include "../gestionJoueurs/defineJoueurs.h"
 #include "../defines.h"
 
 typedef struct pli pli;
@@ -19,6 +20,7 @@ struct situationMain{
     pli previousPli, actualPli;
     couleur coulAtout;
     carte cartePrise;
+    enchereChoixAtout modeMain;
     int nbreAtoutsTombes;
     int firstJoueur;	//peux changer a chaque main => celui qui fait le dernier pli entame le suivant
     int preneur;

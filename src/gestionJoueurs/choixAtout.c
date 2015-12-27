@@ -7,58 +7,82 @@
 void choixModeMain(mainJoueur *joueurs, situationMain *sitM, carte carteVisible){
     fprintf(stderr, "ajouter gestion joueur => choix atout\n");
     int actualJoueur = sitM->firstJoueur;
-    int oldFirstJoueur = actualJoueur;
-    bool oneColor = true;
-    couleur colorChosen = carteVisible.c;
-    int preneur;
+    int compt = 0;
+    bool tourComplet = false;
+    enchereChoixAtout maxEnch = COULEUR_SIMPLE;
+    structChoixAtout s;
+    initStructChoixAtout(&s, &carteVisible);
+    //A SUPPRIMER
+    s.ench = AUCUNE_ENCHERE;
     while(true){
-	if(oneColor){
-	    if(prendColor(&joueurs[actualJoueur], &carteVisible, (actualJoueur == 0))){
-		preneur = actualJoueur;
+	//si il y a eu 1 prise => on etudie
+	s.humanPlayer = (actualJoueur == 0);
+	if(s.tourOne){
+	    if(compt == NBRE_JOUEURS){
+		s.tourOne = false;
+		compt = 0;
+		printf("tour2\n");
+	    }
+	}
+	else {
+	    if(s.ench == AUCUNE_ENCHERE){
+		if(compt == NBRE_JOUEURS-1){
+		    printf("prise obligatoire\n");
+		    s.priseOb = true;
+		}
+	    }
+	    else if(compt == NBRE_JOUEURS){
+		tourComplet  =true;
+	    }
+	}
+	printf("J%d", actualJoueur);
+	if(priseOrNot(&joueurs[actualJoueur], &s)){
+	    printf(" => prise\n");
+	    s.preneur = actualJoueur;
+	    if((s.ench == maxEnch) || s.priseOb || tourComplet){
 		break;
 	    }
+	    compt = 0;
+	    tourComplet = false;
 	}
 	else{
-	    if(priseNonObligatoire(&joueurs[actualJoueur], &carteVisible, &colorChosen, (actualJoueur == 0))){
-		preneur = actualJoueur;
-		break;
-	    }
+	    printf(" => refus\n");
 	}
+	getchar();
 	actualJoueur = (actualJoueur + 1)%4;
-	if(actualJoueur == oldFirstJoueur){
-	    if(oneColor){
-		oneColor = false;
-	    }
-	    else{
-		actualJoueur--;
-		if(actualJoueur < 0){
-		    actualJoueur = 3;
-		}
-		colorChosen = priseObligatoire(&joueurs[actualJoueur], &carteVisible, (actualJoueur == 0));
-		preneur = actualJoueur;
-		break;
-	    }
-	}
+	compt++;
     }
-    sitM->coulAtout = colorChosen;
-    sitM->preneur = preneur;
-    sitM->cartePrise = carteVisible;
+    //A SUPPRIMER
+    s.ench = COULEUR_SIMPLE;
+    setParamChoixAtout(sitM, &s);
+    affSitMain(sitM);
 }
 
-bool priseOrNot(mainJoueur *m, carte *carteVis, couleur *colorChosen, enchereChoixAtout *ench, bool tour1, bool humanPlayer, bool priseOb){
-    if(tour1){
-	*colorChosen = carteVis->c;
-	return prendColor(m, carteVis, humanPlayer);
+bool priseOrNot(mainJoueur *m, structChoixAtout *s){
+    bool result;
+    if(s->tourOne){
+	s->coulChosen = s->carteVisible.c;
+	 if((result=prendColor(m, &(s->carteVisible), s->humanPlayer))){
+	     s->ench = COULEUR_SIMPLE;
+	 }
+	 return result;
     }
     else{
-	if(priseOb){
-	    *colorChosen = priseObligatoire(m, carteVis, humanPlayer);
+	if(s->priseOb){
+	    s->coulChosen = priseObligatoire(m, &(s->carteVisible), s->humanPlayer);
 	    return true;
 	}
 	else{
-	    return priseNonObligatoire(m, carteVis, colorChosen, humanPlayer);
+	    return priseNonObligatoire(m, &(s->carteVisible), &(s->coulChosen), s->humanPlayer);
 	}
     }
+}
+
+void initStructChoixAtout(structChoixAtout *s, carte *c){
+    s->carteVisible = *c;
+    s->ench = AUCUNE_ENCHERE;
+    s->tourOne = true;
+    s->priseOb = false;
 }
 
 bool prendColor(mainJoueur *m, carte *c, bool humanPlayer){
@@ -92,7 +116,7 @@ bool prendColorHumanPlayer(mainJoueur *m, carte *c){
 }
 
 bool prendColorIA(mainJoueur *m, carte *c){
-    return ((valMain(m, c->c) + valCarte(c->r, true)) >= LIM_PRISE);
+    return ((valMain(m, COULEUR_SIMPLE, c->c) + valCarte(c->r, true)) >= LIM_PRISE);
 }
 
 bool priseNonObligatoire(mainJoueur *m, carte *c, couleur *coulChosen, bool humanPlayer){
@@ -111,10 +135,10 @@ bool priseNonObligatoireHumanPlayer(mainJoueur *m, carte *c, couleur *coulChosen
 
 bool priseNonObligatoireIA(mainJoueur *m, carte *carteVis, couleur *coulChosen){
     couleur c, cMax = CARREAU;
-    int max = valMain(m, CARREAU);
+    int max = valMain(m, COULEUR_SIMPLE, CARREAU);
     int val;
     for(c=COEUR; c<NBRE_COUL; c++){
-	val = valMain(m, c);
+	val = valMain(m, COULEUR_SIMPLE, c);
 	if(val>max){
 	    max = val;
 	    cMax = c;
@@ -150,4 +174,7 @@ couleur priseObligatoireIA(mainJoueur *m, carte *carteVis){
     return c;
 }
 
-
+const char* nameModeAtout(enchereChoixAtout m){
+    static const char* name[4] = {"AUCUNE ENCHERE", "COULEUR SIMPLE", "SANS ATOUT", "TOUT ATOUT"};
+    return name[m];
+}

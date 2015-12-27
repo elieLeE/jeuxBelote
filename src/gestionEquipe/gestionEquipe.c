@@ -66,3 +66,9 @@ void reInitEquipe(equipe *eq){
     eq->nbrePliDone = 0;
     eq->ptsActuel = 0;
 }
+
+const char* nameEquipe(numEquipe num){
+    static const char* name[NBRE_EQ] = {"NOUS", "EUX"};
+    assert(num==EQUIPE_1 || num ==EQUIPE_2);
+    return name[num];
+}

@@ -5,6 +5,6 @@
 #include "../gestionJeuCarte/gestionCarte.h"
 
 void addCarte(mainJoueur *m, carte *c);
-int valMain(mainJoueur *m, couleur coulAtout);
+int valMain(mainJoueur *m, enchereChoixAtout modeMain, couleur coulAtout);
 
 #endif

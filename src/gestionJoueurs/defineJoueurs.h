@@ -5,6 +5,7 @@
 #include "../defines.h"
 
 typedef struct mainJoueur mainJoueur;
+typedef struct structChoixAtout structChoixAtout;
 typedef enum enchereChoixAtout enchereChoixAtout;
 
 enum enchereChoixAtout{
@@ -12,6 +13,16 @@ enum enchereChoixAtout{
     COULEUR_SIMPLE,
     SANS_ATOUT,
     TOUT_ATOUT
+};
+
+struct structChoixAtout{
+    carte carteVisible;
+    enchereChoixAtout ench;
+    couleur coulChosen;
+    int preneur;
+    bool tourOne;
+    bool humanPlayer;
+    bool priseOb;
 };
 
 struct mainJoueur{

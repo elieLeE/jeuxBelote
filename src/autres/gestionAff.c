@@ -47,7 +47,7 @@ void affPointsColorMain(mainJoueur *m, char *s){
     couleur c;
     printf("%s => ", s);
     for(c=CARREAU; c<=TREFLE; c++){
-	printf("%s : %d, ", nameCoul(c), valMain(m, c));
+	printf("%s : %d, ", nameCoul(c), valMain(m, COULEUR_SIMPLE, c));
     }
     printf("\n");
 }
@@ -69,13 +69,10 @@ void affMainJoueur(mainJoueur *m, char *s){
     printf("%s : %d cartes\n", s, sum);
 
     for(c=CARREAU; c<=TREFLE; c++){
-	affCoul(m->tabCarte[c], m->nbreCarteInit[c], nameCoul(c), valMain(m, c));
+	affCoul(m->tabCarte[c], m->nbreCarteInit[c], nameCoul(c), valMain(m, COULEUR_SIMPLE, c));
     }
-
-    /*affCoul(m->tabCarte[0], m->nbreCarte[0], "CARREAU", valMain(m, CARREAU));
-    affCoul(m->tabCarte[1], m->nbreCarte[1], "COEUR", valMain(m, COEUR));
-    affCoul(m->tabCarte[2], m->nbreCarte[2], "PIQUE", valMain(m, PIQUE));
-    affCoul(m->tabCarte[3], m->nbreCarte[3], "TREFLE", valMain(m, TREFLE));*/
+    printf("SANS ATOUT : %d\n", valMain(m, SANS_ATOUT, c));
+    printf("TOUT ATOUT : %d\n", valMain(m, TOUT_ATOUT, c));
     printf("\n");
 }
 
@@ -89,8 +86,7 @@ void affMainJoueurs(mainJoueur *joueurs){
 }
 //SITUATION
 void affSitMain(situationMain *sitM){
-    printf("preneur : J%d, cartePrise : %s de %s, coulAtout : %s\n", sitM->preneur, nameRang(sitM->cartePrise.r), 
-	    nameCoul(sitM->cartePrise.c), nameCoul(sitM->coulAtout));
+    printf("firstJoueur : J%d, preneur : J%d, cartePrise : %s de %s, mode : %s, coulAtout : %s\n", sitM->firstJoueur, sitM->preneur, nameRang(sitM->cartePrise.r), nameCoul(sitM->cartePrise.c), nameModeAtout(sitM->modeMain), nameCoul(sitM->coulAtout));
 }
 
 //JEU
