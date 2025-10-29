@@ -3,6 +3,7 @@
 #include "assert.h"
 
 #include "../libC/src/io/io.h"
+#include "../libC/src/str/str.h"
 #include "../libC/src/macros.h"
 #include "../libC/src/mem/mem.h"
 #include "../libC/src/liste/liste.h"
@@ -315,6 +316,82 @@ static void test_does_virtual_player_take_card_second_turn(void)
 /* }}} */
 /* }}} */
 
+static void
+test_get_first_card_human_player_(player_t *player, const char *file_name,
+                                  rang_t expected_rang,
+                                  couleur_t expected_color)
+{
+    FILE *f;
+    const carte_t *obtained_card;
+    carte_t expected_card = {.r = expected_rang, .c = expected_color};
+    const char *files_dir = "./test_files/getting_cards";
+    char file_path[100];
+    int res;
+
+    res = snprintf(file_path, sizeof(file_path), "%s/%s",
+                   files_dir, file_name);
+    ASSERT(res >= 0, "writing data in 'file_path' has failed, res: %d", res);
+
+    f = redirect_stream(stdin, file_path, "r");
+    ASSERT(f != NULL, "redirect_stream has failed with file path %s",
+           file_path);
+
+    logger_trace("start %s", file_path);
+
+    obtained_card = take_first_card_from_player(player, CARREAU);
+
+    ASSERT(cmp_card(obtained_card, &expected_card) == 0,
+           "%s, card obtained: "CARD_FMT ", card expected: "CARD_FMT,
+           file_path, CARD_FMT_ARG(obtained_card),
+           CARD_FMT_ARG((&expected_card)));
+
+    fermer_fichier(&f);
+}
+
+static bool has_player_cards(player_t *player)
+{
+    for (int i = 0; i < NBRE_COUL; i++) {
+        if (!gl_is_empty(&(player->cards[i]))) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static void test_get_first_card_human_player(void)
+{
+    player_t player;
+
+    p_clear(&player, 1);
+
+    player.is_human = true;
+
+    for (int i = SEPT; i < AS; i++) {
+        for (int j = 0; j < NBRE_COUL; j++) {
+            char file_name[100];
+            int res;
+
+            create_card_and_add_to_player(&player, i, j);
+
+            res = snprintf(file_name, sizeof(file_name), "%s_de_%s.txt",
+                           name_rang(i), name_coul(j));
+            ASSERT(res >= 0, "writing data in 'file_path' has failed, res: %d",
+                   res);
+            lower_string(file_name);
+
+            test_get_first_card_human_player_(&player, file_name, i, j);
+            ASSERT(has_player_cards(&player),
+                   "player should not have any cards");
+        }
+    }
+
+    create_card_and_add_to_player(&player, SEPT, COEUR);
+    test_get_first_card_human_player_(&player, "sept_de_coeur_loop3.txt",
+                                      SEPT, COEUR);
+    ASSERT(has_player_cards(&player), "player should not have any cards");
+}
+
 void test_players(void)
 {
     BEGIN_TEST_MODULE("players");
@@ -322,6 +399,7 @@ void test_players(void)
     CALL_TEST_FUNC(test_does_human_player_take_card_second_turn);
     CALL_TEST_FUNC(test_does_virtual_player_take_card_first_turn);
     CALL_TEST_FUNC(test_does_virtual_player_take_card_second_turn);
+    CALL_TEST_FUNC(test_get_first_card_human_player);
 
     END_TEST_MODULE();
 }
