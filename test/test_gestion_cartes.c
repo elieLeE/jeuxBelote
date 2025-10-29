@@ -66,10 +66,10 @@ static void test_coupe_jeu()
     coupe_jeu(jeu2);
 
     idx_coupe = get_card_idx(jeu2, &jeu[0]);
-    ASSERT(idx_coupe > 0 && idx_coupe < NBRE_CARTES -1,
+    ASSERT(idx_coupe > 0 && idx_coupe < NBRE_CARTES,
            "idx_coupe: %d", idx_coupe);
 
-    for (int i = 1, j = idx_coupe + 1; j != idx_coupe; ) {
+    for (int i = 1, j = (idx_coupe + 1) % NBRE_CARTES; j != idx_coupe; ) {
         carte_t *c1 = &jeu[i];
         carte_t *c2 = &jeu2[j];
 
