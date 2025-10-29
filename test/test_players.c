@@ -102,7 +102,7 @@ create_card_and_add_to_player(player_t *player, rang_t r, couleur_t c)
     card->r = r;
     card->c = c;
 
-    gl_add_elem_sorted(&(player->cards[c]), card, cmp_card);
+    add_card_to_player(player, card);
 }
 
 /* {{{ First turn */
