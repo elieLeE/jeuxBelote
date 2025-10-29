@@ -22,9 +22,17 @@ get_player_cards_str(const player_t *player, char out[PLAYER_CARDS_FMT_SIZE])
         const generic_liste_t *l = &(player->cards[i]);
 
         gl_for_each(elem, l->first) {
-            len += snprintf(out + len, PLAYER_CARDS_FMT_SIZE - len,
+            int res;
+
+
+            res = snprintf(out + len, PLAYER_CARDS_FMT_SIZE - len,
                            CARD_FMT ", ",
                            CARD_FMT_ARG(((carte_t *)elem->data)));
+            if (res < 0) {
+                logger_error("writing data has failed: %d", res);
+                return;
+            }
+            len += res;
         }
     }
 }
@@ -437,10 +445,16 @@ get_all_poss_cards_to_play_str(gl_elem_t * const cards[NBRE_CARTES_BY_PLAYER],
     int len = 0;
 
     for (int i = 0; i < nber_cards; i++) {
+        int res;
         carte_t *c = cards[i]->data;
 
-        len += snprintf(out + len, PLAYER_CARDS_FMT_SIZE - len,
+        res = snprintf(out + len, PLAYER_CARDS_FMT_SIZE - len,
                         CARD_FMT " (%d), ", CARD_FMT_ARG(c), i + 1);
+        if (res < 0) {
+            logger_error("writing data has failed: %d", res);
+            return;
+        }
+        len += res;
     }
 }
 
