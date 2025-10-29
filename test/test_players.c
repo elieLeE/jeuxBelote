@@ -32,6 +32,8 @@ test_does_human_player_take_card_second_turn_(const char *file_name,
     player.is_human = true;
 
     f = redirect_stream(stdin, file_name, "r");
+    ASSERT(f != NULL, "redirect_stream has failed with file path %s",
+           file_name);
 
     logger_trace("start %s", file_name);
 
