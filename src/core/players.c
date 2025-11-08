@@ -10,9 +10,6 @@
 #include "carte.h"
 #include "../front/aff.h"
 
-static void remove_elem_card_from_player(player_t *player, gl_elem_t *elem,
-                                         couleur_t color);
-
 void
 get_player_cards_str(const player_t *player, char out[PLAYER_CARDS_FMT_SIZE])
 {
@@ -371,6 +368,8 @@ does_player_take_card_second_turn(const player_t *player, const carte_t *card,
 /* }}} */
 /* {{{ Play a card */
 
+static void remove_elem_card_from_player(player_t *player, gl_elem_t *elem);
+
 static int get_cards_of_color(player_t *player, couleur_t card_color,
                               const carte_t *leading_card,
                               bool only_best_card_if_have,
@@ -689,7 +688,7 @@ take_first_card_from_human_player(player_t *player, couleur_t trump_color)
                                                      trump_color, -1));
     card_to_play = elem->data;
 
-    remove_elem_card_from_player(player, elem, card_to_play->c);
+    remove_elem_card_from_player(player, elem);
 
     return card_to_play;
 }
@@ -717,7 +716,7 @@ take_card_from_human_player(player_t *player, couleur_t asked_color,
                                                   leading_card->idx_player));
     card_to_play = elem->data;
 
-    remove_elem_card_from_player(player, elem, card_to_play->c);
+    remove_elem_card_from_player(player, elem);
 
     return card_to_play;
 }
@@ -782,7 +781,7 @@ take_card_from_virtual_player(player_t *player, couleur_t asked_color,
 
     elem = elem_cards[0];
     card_to_play = elem->data;
-    remove_elem_card_from_player(player, elem, card_to_play->c);
+    remove_elem_card_from_player(player, elem);
 
     return card_to_play;
 }
@@ -836,10 +835,11 @@ void add_card_to_player(player_t *player, carte_t *card)
     gl_add_elem_sorted(list_cards, card, cmp_card_descending_order);
 }
 
-static void remove_elem_card_from_player(player_t *player, gl_elem_t *elem,
-                                         couleur_t color)
+static void remove_elem_card_from_player(player_t *player, gl_elem_t *elem)
 {
-    gl_remove_elem(&(player->cards[color]), elem);
+    carte_t *card = elem->data;
+
+    gl_remove_elem(&(player->cards[card->c]), elem);
 }
 
 void free_player_cards(player_t *player)
