@@ -13,7 +13,7 @@ void display_game(const carte_t game[])
 
 void display_player_cards(const char *txt, const player_t *player)
 {
-    char players_cards_str[PLAYER_CARDS_FMT_SIZE];
+    char players_cards_str[PLAYER_CARDS_FMT_SIZE] = {0};
 
     get_player_cards_str(player, players_cards_str);
 
