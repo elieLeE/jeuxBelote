@@ -371,16 +371,33 @@ does_player_take_card_second_turn(const player_t *player, const carte_t *card,
 /* }}} */
 /* {{{ Play a card */
 
-static int get_all_cards_of_color(player_t *player, couleur_t card_color,
-                                  gl_elem_t *out[NBRE_CARTES_BY_PLAYER],
-                                  int first_idx)
+static int get_cards_of_color(player_t *player, couleur_t card_color,
+                              const carte_t *leading_card,
+                              bool only_best_card_if_have,
+                              gl_elem_t *out[NBRE_CARTES_BY_PLAYER],
+                              int first_idx)
 {
     int idx = first_idx;
     const generic_liste_t *cards_list = &(player->cards[card_color]);
 
     gl_for_each(elem, cards_list->first) {
-        logger_trace("getting card " CARD_FMT,
-                     CARD_FMT_ARG(((carte_t *)elem->data)));
+        carte_t *current_card = elem->data;
+
+        if (only_best_card_if_have && cmp_card(leading_card, current_card) > 0)
+        {
+            if (idx > first_idx) {
+                /* at least, one card have been found => player has to play
+                 * one of these cards */
+                logger_trace("card " CARD_FMT " is rejected as it is below "
+                             "than the mater card and player has to take the "
+                             "lead if he can", CARD_FMT_ARG(current_card));
+                logger_trace("all the others cards are below this one "
+                             "(on this color) => stop the loop");
+                break;
+            }
+        }
+
+        logger_trace("getting card " CARD_FMT, CARD_FMT_ARG(current_card));
 
         ASSERT(idx < NBRE_CARTES_BY_PLAYER, "idx: %d", idx);
 
@@ -394,23 +411,31 @@ static int get_all_cards_of_color(player_t *player, couleur_t card_color,
 
 static int
 get_all_possible_cards(player_t *player, couleur_t asked_color,
-                       couleur_t trump_color, int idx_leading_player,
+                       couleur_t trump_color,
+                       const card_played_t * const leading_card,
                        gl_elem_t *out[NBRE_CARTES_BY_PLAYER])
 {
     int count_possible_cards = 0;
 
     if (!gl_is_empty(&(player->cards[asked_color]))) {
-        return get_all_cards_of_color(player, asked_color, out, 0);
+        return get_cards_of_color(player, asked_color, leading_card->card,
+                                  asked_color == trump_color, out, 0);
     } else {
         logger_trace("player has not card of the asked color (%s)",
                      name_coul(asked_color));
     }
 
     if (!gl_is_empty(&(player->cards[trump_color]))) {
-        count_possible_cards =
-            get_all_cards_of_color(player, trump_color, out, 0);
+        bool is_other_team_master;
 
-        if (player->idx != (idx_leading_player + 2) % NBRE_JOUEURS) {
+        is_other_team_master =
+            (player->idx != (leading_card->idx_player + 2) % NBRE_JOUEURS);
+
+        count_possible_cards =
+            get_cards_of_color(player, trump_color, leading_card->card,
+                               is_other_team_master, out, 0);
+
+        if (is_other_team_master) {
             logger_trace("teammate is no master - player has to play a trump "
                          "card (as it has at least one)");
             return count_possible_cards;
@@ -422,8 +447,10 @@ get_all_possible_cards(player_t *player, couleur_t asked_color,
 
     for (couleur_t i = CARREAU; i <= TREFLE; i++) {
         if (i != asked_color && i != trump_color) {
-            int count = get_all_cards_of_color(player, i, out,
-                                               count_possible_cards);
+            int count;
+
+            count = get_cards_of_color(player, i, leading_card->card,
+                                       false, out, count_possible_cards);
             count_possible_cards += count;
 
             logger_trace("%d cards on color %s, %d cards at total",
@@ -668,7 +695,8 @@ take_first_card_from_human_player(player_t *player, couleur_t trump_color)
 
 const carte_t *
 take_card_from_human_player(player_t *player, couleur_t asked_color,
-                            couleur_t trump_color, int idx_leading_player)
+                            couleur_t trump_color,
+                            const card_played_t * const leading_card)
 {
     gl_elem_t *elem_cards[NBRE_CARTES_BY_PLAYER] = {NULL};
     int count_cards;
@@ -676,13 +704,14 @@ take_card_from_human_player(player_t *player, couleur_t asked_color,
     const carte_t *card_to_play;
 
     count_cards = get_all_possible_cards(player, asked_color, trump_color,
-                                         idx_leading_player, elem_cards);
+                                         leading_card, elem_cards);
 
     if (count_cards == 0) {
         logger_fatal("no cards have been found for player %d", player->idx);
     }
     elem = get_elem_card_from_human_player(elem_cards, count_cards,
-                                           trump_color, idx_leading_player);
+                                           trump_color,
+                                           leading_card->idx_player);
     card_to_play = elem->data;
 
     remove_elem_card_from_player(player, elem, card_to_play->c);
@@ -727,7 +756,7 @@ take_first_card_from_virtual_player(player_t *player, couleur_t trump_color)
 const carte_t *
 take_card_from_virtual_player(player_t *player, couleur_t asked_color,
                               couleur_t trump_color,
-                              int idx_leading_player)
+                              const card_played_t * const leading_card)
 {
     char players_cards_str[PLAYER_CARDS_FMT_SIZE];
     carte_t *card_to_play;
@@ -742,7 +771,7 @@ take_card_from_virtual_player(player_t *player, couleur_t asked_color,
 
     /* For now, virtual player plays the first possible card it finds */
     count_cards = get_all_possible_cards(player, asked_color, trump_color,
-                                         idx_leading_player, elem_cards);
+                                         leading_card, elem_cards);
 
     if (count_cards == 0) {
         logger_fatal("no cards have been found for player %d", player->idx);
@@ -770,14 +799,15 @@ take_first_card_from_player(player_t *player, couleur_t trump_color)
 
 const carte_t *
 take_card_from_player(player_t *player, couleur_t asked_color,
-                      couleur_t trump_color, int idx_leading_player)
+                      couleur_t trump_color,
+                      const card_played_t * const leading_card)
 {
     if (player->is_human) {
         return take_card_from_human_player(player, asked_color, trump_color,
-                                           idx_leading_player);
+                                           leading_card);
     } else {
         return take_card_from_virtual_player(player, asked_color, trump_color,
-                                             idx_leading_player);
+                                             leading_card);
     }
     return NULL;
 }

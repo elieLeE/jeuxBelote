@@ -192,15 +192,16 @@ get_next_first_trick_card(player_t *player, couleur_t trump_color)
 }
 
 static const carte_t *
-get_next_trick_card(player_t *player,couleur_t asked_color,
-                    couleur_t trump_color, int idx_leading_player)
+get_next_trick_card(player_t *player, couleur_t asked_color,
+                    couleur_t trump_color,
+                    const card_played_t * const leading_card)
 {
     const carte_t *card;
 
     logger_trace("it is the turn of the player %d", player->idx);
 
     card = take_card_from_player(player, asked_color, trump_color,
-                                 idx_leading_player);
+                                 leading_card);
     if (!card) {
         logger_fatal("the player %d has returned a card NULL", player->idx);
     }
@@ -217,13 +218,14 @@ static int get_next_trick(player_t players[NBRE_JOUEURS], int idx_first_player,
     int idx_player;
     int idx_leading_player = idx_first_player;
     int player_counter = 1;
-    const carte_t *master_card = NULL;
+    const card_played_t *master_card = NULL;
     const carte_t *first_card = NULL;
 
-    first_card = master_card =
+    first_card =
         get_next_first_trick_card(&(players[idx_first_player]), trump_color);
 
-    set_card_played_info(&out->cards[0], first_card, idx_first_player);
+    set_card_played_info(&(out->cards[0]), first_card, idx_first_player);
+    master_card = &(out->cards[0]);
 
     idx_player = GET_NEXT_PLAYER_IDX(idx_first_player);
 
@@ -232,17 +234,17 @@ static int get_next_trick(player_t players[NBRE_JOUEURS], int idx_first_player,
 
         opponent_card =
             get_next_trick_card(&(players[idx_player]), first_card->c,
-                                trump_color, idx_leading_player);
-
-        if (cmp_card(master_card, opponent_card) < 0) {
-            logger_debug("the card '" CARD_FMT "' takes the lead",
-                         CARD_FMT_ARG(opponent_card));
-            master_card = opponent_card;
-            idx_leading_player = idx_player;
-        }
+                                trump_color, master_card);
 
         set_card_played_info(&(out->cards[player_counter]), opponent_card,
                              idx_player);
+
+        if (cmp_card(master_card->card, opponent_card) < 0) {
+            logger_debug("the card '" CARD_FMT "' takes the lead",
+                         CARD_FMT_ARG(opponent_card));
+            master_card = &(out->cards[player_counter]);
+            idx_leading_player = idx_player;
+        }
 
         player_counter++;
         idx_player = GET_NEXT_PLAYER_IDX(idx_player);

@@ -6,6 +6,7 @@
 #include "../../libC/src/liste/liste.h"
 
 #include "carte.h"
+#include "gestion_partie.h"
 #include "../macros.h"
 
 #define PLAYER_CARDS_FMT_SIZE 200
@@ -38,7 +39,7 @@ const carte_t *
 take_first_card_from_player(player_t *player, couleur_t trump_color);
 const carte_t *take_card_from_player(player_t *player, couleur_t asked_color,
                                      couleur_t trump_color,
-                                     int idx_player_master_card);
+                                     const card_played_t * const leading_card);
 
 void add_card_to_player(player_t *player, carte_t *card);
 
