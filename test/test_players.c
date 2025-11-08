@@ -350,6 +350,7 @@ test_get_first_card_human_player_(player_t *player, const char *file_name,
            CARD_FMT_ARG((&expected_card)));
 
     fermer_fichier(&f);
+    p_free((void **)&obtained_card);
 }
 
 static bool has_player_cards(player_t *player)
