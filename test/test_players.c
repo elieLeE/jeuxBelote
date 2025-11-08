@@ -13,6 +13,34 @@
 #include "../src/core/carte.h"
 #include "../src/core/players.h"
 
+/* {{{ Helpers */
+
+static void
+create_card_and_add_to_player(player_t *player, rang_t r, couleur_t c)
+{
+    carte_t *card = p_calloc(sizeof(carte_t) * 1);
+
+    assert(card !=  NULL);
+
+    card->r = r;
+    card->c = c;
+
+    add_card_to_player(player, card);
+}
+
+static void free_card(void *card)
+{
+    p_free(&card);
+}
+
+static void free_player_cards_(player_t *player)
+{
+    for (int i = 0; i < NBRE_COUL; i++) {
+        gl_free(&(player->cards[i]), free_card);
+    }
+}
+
+/* }}} */
 /* {{{ Trump selection */
 /* {{{ Human player */
 
@@ -82,30 +110,6 @@ static void test_does_human_player_take_card_second_turn(void)
 
 /* }}} */
 /* {{{ Vurtual player */
-
-static void free_card(void *card)
-{
-    p_free(&card);
-}
-
-static void free_player_cards_(player_t *player)
-{
-    for (int i = 0; i < NBRE_COUL; i++) {
-        gl_free(&(player->cards[i]), free_card);
-    }
-}
-
-static void
-create_card_and_add_to_player(player_t *player, rang_t r, couleur_t c)
-{
-    carte_t *card = p_calloc(sizeof(carte_t) * 1);
-
-    card->r = r;
-    card->c = c;
-
-    add_card_to_player(player, card);
-}
-
 /* {{{ First turn */
 
 static void
