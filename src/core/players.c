@@ -685,7 +685,8 @@ take_first_card_from_human_player(player_t *player, couleur_t trump_color)
         }
     }
 
-    elem = get_elem_card_from_human_player(player_cards, idx, trump_color, -1);
+    elem = RETHROW_P(get_elem_card_from_human_player(player_cards, idx,
+                                                     trump_color, -1));
     card_to_play = elem->data;
 
     remove_elem_card_from_player(player, elem, card_to_play->c);
@@ -709,9 +710,11 @@ take_card_from_human_player(player_t *player, couleur_t asked_color,
     if (count_cards == 0) {
         logger_fatal("no cards have been found for player %d", player->idx);
     }
-    elem = get_elem_card_from_human_player(elem_cards, count_cards,
-                                           trump_color,
-                                           leading_card->idx_player);
+
+    elem =
+        RETHROW_P(get_elem_card_from_human_player(elem_cards, count_cards,
+                                                  trump_color,
+                                                  leading_card->idx_player));
     card_to_play = elem->data;
 
     remove_elem_card_from_player(player, elem, card_to_play->c);
