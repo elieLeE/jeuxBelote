@@ -839,7 +839,7 @@ static void remove_elem_card_from_player(player_t *player, gl_elem_t *elem)
 {
     carte_t *card = elem->data;
 
-    gl_remove_elem(&(player->cards[card->c]), elem);
+    gl_delete_elem(&(player->cards[card->c]), elem, NULL);
 }
 
 void free_player_cards(player_t *player)
