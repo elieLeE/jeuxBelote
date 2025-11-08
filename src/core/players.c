@@ -750,7 +750,7 @@ take_first_card_from_virtual_player(player_t *player, couleur_t trump_color)
     }
 
     card_to_play = elem->data;
-    remove_elem_card_from_player(player, elem, card_to_play->c);
+    remove_elem_card_from_player(player, elem);
 
     return card_to_play;
 }
