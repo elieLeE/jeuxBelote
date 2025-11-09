@@ -82,12 +82,13 @@ static void test_coupe_jeu()
     }
 }
 
-void test_gestion_cartes(void)
+module_tests_t *get_all_test_gestion_cartes(void)
 {
-    BEGIN_TEST_MODULE("gestion cartes");
+    module_tests_t *module_tests = RETHROW_P(p_calloc(sizeof(module_tests_t)));
 
-    CALL_TEST_FUNC(test_melange_jeu);
-    CALL_TEST_FUNC(test_coupe_jeu);
+    set_module_name(module_tests, "GESTION CARTES");
+    ADD_TEST_TO_MODULE(module_tests, test_melange_jeu);
+    ADD_TEST_TO_MODULE(module_tests, test_coupe_jeu);
 
-    END_TEST_MODULE();
+    return module_tests;
 }
