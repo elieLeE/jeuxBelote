@@ -358,6 +358,52 @@ static void sort_all_players_trump_cards(player_t players[NBRE_JOUEURS],
     }
 }
 
+static int
+copy_cards_won_by_team(const trick_t tricks[NBER_TRICKS], int idx_team_cards,
+                       int first_idx_array_game, carte_t game[NBRE_CARTES])
+{
+    /* In the belote game, we take all the cards of the tricks done by one
+     * of the teams and put them on the other stack of the tricks done by the
+     * other team.
+     * In this team, the cards in the array 'game' are reset by value. So,
+     * the structures are copied. Indeed, I forgot that the cards stack should
+     * be reset like this and I have created a array of cards, and no an array
+     * of pointers of cards. As the card structure is light, it is not really
+     * bad to do the copy as value and it lets me not update all code using
+     * this stack cards. If never, the card structure becomes heavier, it will
+     * time to do it. */
+    int idx_card = first_idx_array_game;
+
+    for (int i = 0; i < NBER_TRICKS; i++) {
+        const trick_t *trick = &tricks[i];
+        int idx_team_won_trick = GET_TEAM_INDEX(trick->idx_player_won);
+
+        if (idx_team_won_trick == idx_team_cards) {
+            for (int j = 0; j < NBER_CARDS_BY_TRICK; j++) {
+                ASSERT(idx_card < NBRE_CARTES, "idx_card: %d", idx_card);
+
+                game[idx_card] = *(trick->cards[j].card);
+
+                idx_card++;
+            }
+        }
+    }
+
+    return idx_card;
+}
+
+static void reset_game_from_tricks(const trick_t tricks[NBER_TRICKS],
+                                   carte_t game[NBRE_CARTES])
+{
+    int idx_team = rand() % NBER_TEAMS;
+    int idx_card;
+
+    idx_card = copy_cards_won_by_team(tricks, idx_team, 0, game);
+
+    idx_team = (idx_team + 1) % NBER_TEAMS;
+    copy_cards_won_by_team(tricks, idx_team, idx_card, game);
+}
+
 /* handling a new round:
  * - split the cards (the determining of the trump is done inside)
  * - do the trick
@@ -393,6 +439,8 @@ start_new_ronud(carte_t game[NBRE_CARTES], player_t players[NBRE_JOUEURS],
         }
 
         reset_cards_trump_status(game);
+
+        reset_game_from_tricks(tricks, game);
     } else {
         logger_info("none players has taken the card - "
                     "this round is canceled");
