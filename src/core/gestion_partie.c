@@ -291,7 +291,8 @@ static int get_trick_pts(const trick_t *trick, couleur_t trump_color,
     return sum;
 }
 
-static void add_last_trick_ten_pts(trick_t *last_trick, int out[NBER_TEAMS])
+static void
+add_last_trick_ten_pts(const trick_t *last_trick, int out[NBER_TEAMS])
 {
     int idx_team_won_trick = GET_TEAM_INDEX(last_trick->idx_player_won);
 
@@ -299,7 +300,7 @@ static void add_last_trick_ten_pts(trick_t *last_trick, int out[NBER_TEAMS])
 }
 
 static void
-get_round_teams_pts(trick_t tricks[NBER_TRICKS], couleur_t trump_color,
+get_round_teams_pts(const trick_t tricks[NBER_TRICKS], couleur_t trump_color,
                     int idx_player_taking, int out[NBER_TEAMS])
 {
     /* TODO => handle case where the teams are the same number of points.
@@ -311,7 +312,7 @@ get_round_teams_pts(trick_t tricks[NBER_TRICKS], couleur_t trump_color,
     int count_belote_and_re_teams[NBER_TEAMS] = {0, 0};
 
     for (int i = 0; i < NBER_TRICKS; i++) {
-        trick_t *trick = &tricks[i];
+        const trick_t *trick = &tricks[i];
         int idx_team = GET_TEAM_INDEX(trick->idx_player_won);
 
         out[idx_team] +=
