@@ -36,7 +36,7 @@ static void free_card(void *card)
 static void free_player_cards_(player_t *player)
 {
     for (int i = 0; i < NBRE_COUL; i++) {
-        gl_free(&(player->cards[i]), free_card);
+        gl_wipe(&(player->cards[i]), free_card);
     }
 }
 

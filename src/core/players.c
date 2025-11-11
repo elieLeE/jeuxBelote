@@ -845,7 +845,7 @@ static void remove_elem_card_from_player(player_t *player, gl_elem_t *elem)
 void free_player_cards(player_t *player)
 {
     for (int i = 0; i < NBRE_COUL; i++) {
-        gl_free(&(player->cards[i]), NULL);
+        gl_wipe(&(player->cards[i]), NULL);
     }
 }
 
