@@ -1,6 +1,5 @@
 #include <string.h>
 
-#include "../../libC/src/liste/liste.h"
 #include "../../libC/src/io/io.h"
 #include "../../libC/src/str/str.h"
 #include "../../libC/src/macros.h"
