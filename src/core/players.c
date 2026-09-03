@@ -3,7 +3,7 @@
 #include "../../libC/src/io/io.h"
 #include "../../libC/src/str/str.h"
 #include "../../libC/src/macros.h"
-#include "../../libC/libc.h"
+#include "../../libC/src/attributes.h"
 
 #include "players.h"
 #include "carte.h"

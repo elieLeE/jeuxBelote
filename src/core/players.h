@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-#include "../../libC/src/liste/liste.h"
+#include "../../libC/src/containers/liste.h"
 
 #include "carte.h"
 #include "gestion_partie.h"

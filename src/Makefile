@@ -12,8 +12,13 @@ CFLAGS=-std=c2x -Wextra -Wall# -ansi -pedantic
 LDFLAGS=
 EXEC=prog
 LIB_C=../libC/src
-SRC= $(wildcard *.c */*.c $(LIB_C)/logger/logger.c $(LIB_C)/liste/liste.c\
-	 $(LIB_C)/mem/mem.c $(LIB_C)/io/io.c $(LIB_C)/str/str.c)
+SRC= $(wildcard *.c\
+	 */*.c\
+	 $(LIB_C)/logger/logger.c\
+	 $(LIB_C)/containers/liste.c\
+	 $(LIB_C)/mem/mem.c\
+	 $(LIB_C)/io/io.c\
+	 $(LIB_C)/str/str.c)
 OBJ= $(SRC:.c=.o)
 
 all: $(EXEC) clean
